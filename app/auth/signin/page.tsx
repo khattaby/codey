@@ -17,31 +17,26 @@ function SignInForm() {
   // Get the callbackUrl from URL parameters
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setLoading(true)
-  setError("")
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
-  try {
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      callbackUrl,
-    })
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        callbackUrl, 
+        redirect: true, 
+      })
+      
 
-    if (result?.ok && result.url) {
-      router.push(result.url)
-    } else {
-      setError("Invalid email or password")
+      
+    } catch {
+      setError("An error occurred")
+      setLoading(false)
     }
-  } catch {
-    setError("An unexpected error occurred")
-  } finally {
-    setLoading(false)
   }
-}
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
