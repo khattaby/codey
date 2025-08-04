@@ -27,18 +27,25 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid credentials")
       } else if (result?.ok) {
-        // Wait a bit for session to be established
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
-        // Get fresh session
+        // Use NextAuth's built-in callbackUrl for server-side redirect
         const session = await getSession()
         
         if (session?.user?.role === "ADMIN") {
-          // Force full page reload for Vercel
-          window.location.replace("/admin")
+          // Server-side redirect for admin
+          await signIn("credentials", {
+            email,
+            password,
+            callbackUrl: "/admin",
+            redirect: true
+          })
         } else {
-          // Force full page reload for Vercel
-          window.location.replace("/")
+          // Server-side redirect for regular user
+          await signIn("credentials", {
+            email,
+            password,
+            callbackUrl: "/",
+            redirect: true
+          })
         }
       }
     } catch {
