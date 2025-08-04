@@ -43,6 +43,7 @@ const handler = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role, // Include role
         }
       }
     })
@@ -54,12 +55,17 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.role = user.role // Include role in JWT
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user = { ...session.user, id: token.id as string }
+        session.user = { 
+          ...session.user, 
+          id: token.id as string,
+          role: token.role as string // Include role in session
+        }
       }
       return session
     },

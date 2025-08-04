@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -27,7 +27,14 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid credentials")
       } else {
-        router.push("/")
+        // Get the session to check user role
+        const session = await getSession()
+        
+        if (session?.user?.role === "ADMIN") {
+          router.push("/admin") // Auto-redirect admin to dashboard
+        } else {
+          router.push("/") // Redirect regular users to home
+        }
       }
     } catch {
       setError("An error occurred")

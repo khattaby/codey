@@ -24,7 +24,7 @@ export default function SignUp() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, phone, password }), // Added phone here
+        body: JSON.stringify({ name, email, phone, password, role: "USER" }),
       });
 
       if (response.ok) {
@@ -72,7 +72,7 @@ export default function SignUp() {
             </div>
             <div>
               <input
-                type="number"
+                type="tel"
                 required
                 placeholder="Phone number"
                 value={phone}

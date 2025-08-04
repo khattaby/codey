@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, phone, password } = await request.json() // Added phone here
+    const { name, email, phone, password, role } = await request.json() // Added role here
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -34,6 +34,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Validate role (optional - defaults to USER if not provided)
+    const userRole = role && (role === 'ADMIN' || role === 'USER') ? role : 'USER'
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
@@ -42,8 +45,9 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         email,
-        phone, // Added phone here
+        phone,
         password: hashedPassword,
+        role: userRole, // Added role here
       }
     })
 
