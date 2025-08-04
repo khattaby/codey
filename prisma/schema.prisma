@@ -8,7 +8,26 @@ datasource db {
   url      = env("POSTGRES_URL_NON_POOLING")
 }
 
-model Test {
-  id    Int    @id @default(autoincrement())
-  name  String
+// NextAuth.js Models
+enum UserRole {
+  USER
+  ADMIN
 }
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  phone         String?   @unique
+  password      String
+  image         String?
+  role          UserRole  @default(USER)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+
