@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   if (session) {
     return (
@@ -13,7 +13,7 @@ export default function Home() {
             Welcome back, {session.user?.name}!
           </h1>
           <p className="text-gray-600 mb-6">
-            You're successfully signed in to your Codey account.
+            You&apos;re successfully signed in to your Codey account.
           </p>
         </div>
       </div>
