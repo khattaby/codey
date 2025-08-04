@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json()
+    const { name, email, phone, password } = await request.json() // Added phone here
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -20,6 +20,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if phone number already exists (if provided)
+    if (phone) {
+      const existingPhone = await prisma.user.findUnique({
+        where: { phone }
+      })
+
+      if (existingPhone) {
+        return NextResponse.json(
+          { error: "Phone number already registered" },
+          { status: 400 }
+        )
+      }
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
@@ -28,6 +42,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         email,
+        phone, // Added phone here
         password: hashedPassword,
       }
     })
