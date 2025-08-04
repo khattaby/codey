@@ -43,7 +43,7 @@ const handler = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role, // Include role
+          role: user.role,
         }
       }
     })
@@ -55,7 +55,7 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.role = user.role // Include role in JWT
+        token.role = user.role
       }
       return token
     },
@@ -64,16 +64,34 @@ const handler = NextAuth({
         session.user = { 
           ...session.user, 
           id: token.id as string,
-          role: token.role as string // Include role in session
+          role: token.role as string
         }
       }
       return session
+    },
+    // ADD THIS - Critical for Vercel deployment
+    async redirect({ url, baseUrl }) {
+      // Handle role-based redirects
+      if (url.includes('role=ADMIN')) {
+        return `${baseUrl}/admin`
+      }
+      if (url.includes('role=USER')) {
+        return `${baseUrl}/`
+      }
+      
+      // Default NextAuth redirect logic
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
     },
   },
   pages: {
     signIn: '/auth/signin',
     newUser: '/auth/signup',
   },
+  // ADD THESE - Essential for production
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 })
 
 export { handler as GET, handler as POST }
