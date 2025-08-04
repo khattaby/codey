@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -18,7 +18,6 @@ export default function SignIn() {
     setError("")
 
     try {
-      // Use NextAuth's built-in redirect with callbackUrl
       const result = await signIn("credentials", {
         email,
         password,
@@ -28,8 +27,16 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid credentials")
       } else if (result?.ok) {
-        // Force a page refresh to ensure session is properly loaded
-        window.location.href = "/"
+        // Get the session to check user role
+        const session = await getSession()
+        
+        if (session?.user?.role === "ADMIN") {
+          // Use window.location for reliable redirect on Vercel
+          window.location.href = "/admin"
+        } else {
+          // Use window.location for reliable redirect on Vercel
+          window.location.href = "/"
+        }
       }
     } catch {
       setError("An error occurred")
