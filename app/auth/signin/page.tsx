@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { signIn, getSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { signIn } from "next-auth/react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
 export default function SignIn() {
@@ -11,6 +11,10 @@ export default function SignIn() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Get the callbackUrl from URL parameters
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,36 +25,15 @@ export default function SignIn() {
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        callbackUrl, // Use the callbackUrl from URL parameters
+        redirect: true, // Let NextAuth handle the redirect
       })
 
-      if (result?.error) {
-        setError("Invalid credentials")
-      } else if (result?.ok) {
-        // Use NextAuth's built-in callbackUrl for server-side redirect
-        const session = await getSession()
-        
-        if (session?.user?.role === "ADMIN") {
-          // Server-side redirect for admin
-          await signIn("credentials", {
-            email,
-            password,
-            callbackUrl: "/admin",
-            redirect: true
-          })
-        } else {
-          // Server-side redirect for regular user
-          await signIn("credentials", {
-            email,
-            password,
-            callbackUrl: "/",
-            redirect: true
-          })
-        }
-      }
+      // If redirect is true, NextAuth will handle the redirect automatically
+      // No need for additional logic here
+      
     } catch {
       setError("An error occurred")
-    } finally {
       setLoading(false)
     }
   }
