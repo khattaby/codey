@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, Suspense } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
-export default function SignIn() {
+// Separate component for search params to wrap in Suspense
+function SignInForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -28,9 +29,6 @@ export default function SignIn() {
         callbackUrl, // Use the callbackUrl from URL parameters
         redirect: true, // Let NextAuth handle the redirect
       })
-
-      // If redirect is true, NextAuth will handle the redirect automatically
-      // No need for additional logic here
       
     } catch {
       setError("An error occurred")
@@ -92,5 +90,26 @@ export default function SignIn() {
         </form>
       </div>
     </div>
+  )
+}
+
+// Loading fallback component
+function SignInLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+        <p className="mt-2 text-gray-600">Loading...</p>
+      </div>
+    </div>
+  )
+}
+
+// Main component with Suspense boundary
+export default function SignIn() {
+  return (
+    <Suspense fallback={<SignInLoading />}>
+      <SignInForm />
+    </Suspense>
   )
 }
