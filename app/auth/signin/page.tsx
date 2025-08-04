@@ -27,15 +27,18 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid credentials")
       } else if (result?.ok) {
-        // Get the session to check user role
+        // Wait a bit for session to be established
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // Get fresh session
         const session = await getSession()
         
         if (session?.user?.role === "ADMIN") {
-          // Use window.location for reliable redirect on Vercel
-          window.location.href = "/admin"
+          // Force full page reload for Vercel
+          window.location.replace("/admin")
         } else {
-          // Use window.location for reliable redirect on Vercel
-          window.location.href = "/"
+          // Force full page reload for Vercel
+          window.location.replace("/")
         }
       }
     } catch {
