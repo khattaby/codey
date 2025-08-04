@@ -29,7 +29,7 @@ export default function SignIn() {
         setError("Invalid credentials")
       } else if (result?.ok) {
         // Force a page refresh to ensure session is properly loaded
-        window.location.href = "/api/auth/session?redirect=true"
+        window.location.href = "/"
       }
     } catch {
       setError("An error occurred")
